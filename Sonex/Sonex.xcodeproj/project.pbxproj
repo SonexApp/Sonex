@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		9CF4979C2F770AD000F57BCE /* Sonex Clip View.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 9CF497902F770ACF00F57BCE /* Sonex Clip View.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		9CF8F31D2F7C0E3E00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31C2F7C0E3E00D428A7 /* SonexShared */; };
+		9CF8F3202F7C0E9C00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31F2F7C0E9C00D428A7 /* SonexShared */; };
+		9CF8F3542F7C128A00D428A7 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3532F7C128A00D428A7 /* Auth */; };
+		9CF8F3562F7C128A00D428A7 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3552F7C128A00D428A7 /* Functions */; };
+		9CF8F3582F7C128A00D428A7 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3572F7C128A00D428A7 /* PostgREST */; };
+		9CF8F35A2F7C128A00D428A7 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3592F7C128A00D428A7 /* Realtime */; };
+		9CF8F35C2F7C128A00D428A7 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F35B2F7C128A00D428A7 /* Storage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +44,7 @@
 /* Begin PBXFileReference section */
 		9CF4977E2F770A7300F57BCE /* Sonex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sonex.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CF497902F770ACF00F57BCE /* Sonex Clip View.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sonex Clip View.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9CF8F31A2F7C0D5600D428A7 /* SonexShared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SonexShared; path = ../SonexShared; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -70,6 +78,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CF8F35C2F7C128A00D428A7 /* Storage in Frameworks */,
+				9CF8F3582F7C128A00D428A7 /* PostgREST in Frameworks */,
+				9CF8F3562F7C128A00D428A7 /* Functions in Frameworks */,
+				9CF8F3542F7C128A00D428A7 /* Auth in Frameworks */,
+				9CF8F35A2F7C128A00D428A7 /* Realtime in Frameworks */,
+				9CF8F31D2F7C0E3E00D428A7 /* SonexShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CF8F3202F7C0E9C00D428A7 /* SonexShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,8 +101,10 @@
 		9CF497752F770A7300F57BCE = {
 			isa = PBXGroup;
 			children = (
+				9CF8F31A2F7C0D5600D428A7 /* SonexShared */,
 				9CF497802F770A7300F57BCE /* Sonex */,
 				9CF497912F770ACF00F57BCE /* Sonex Clip View */,
+				9CF8F31E2F7C0E9400D428A7 /* Frameworks */,
 				9CF4977F2F770A7300F57BCE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -99,6 +116,13 @@
 				9CF497902F770ACF00F57BCE /* Sonex Clip View.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9CF8F31E2F7C0E9400D428A7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -123,6 +147,12 @@
 			);
 			name = Sonex;
 			packageProductDependencies = (
+				9CF8F31C2F7C0E3E00D428A7 /* SonexShared */,
+				9CF8F3532F7C128A00D428A7 /* Auth */,
+				9CF8F3552F7C128A00D428A7 /* Functions */,
+				9CF8F3572F7C128A00D428A7 /* PostgREST */,
+				9CF8F3592F7C128A00D428A7 /* Realtime */,
+				9CF8F35B2F7C128A00D428A7 /* Storage */,
 			);
 			productName = Sonex;
 			productReference = 9CF4977E2F770A7300F57BCE /* Sonex.app */;
@@ -145,6 +175,7 @@
 			);
 			name = "Sonex Clip View";
 			packageProductDependencies = (
+				9CF8F31F2F7C0E9C00D428A7 /* SonexShared */,
 			);
 			productName = "Sonex Clip View";
 			productReference = 9CF497902F770ACF00F57BCE /* Sonex Clip View.app */;
@@ -177,6 +208,10 @@
 			);
 			mainGroup = 9CF497752F770A7300F57BCE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9CF8F31B2F7C0E3E00D428A7 /* XCLocalSwiftPackageReference "../SonexShared" */,
+				9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9CF4977F2F770A7300F57BCE /* Products */;
 			projectDirPath = "";
@@ -362,11 +397,11 @@
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -394,11 +429,11 @@
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -517,6 +552,61 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		9CF8F31B2F7C0E3E00D428A7 /* XCLocalSwiftPackageReference "../SonexShared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../SonexShared;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9CF8F31C2F7C0E3E00D428A7 /* SonexShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SonexShared;
+		};
+		9CF8F31F2F7C0E9C00D428A7 /* SonexShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F31B2F7C0E3E00D428A7 /* XCLocalSwiftPackageReference "../SonexShared" */;
+			productName = SonexShared;
+		};
+		9CF8F3532F7C128A00D428A7 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		9CF8F3552F7C128A00D428A7 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		9CF8F3572F7C128A00D428A7 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		9CF8F3592F7C128A00D428A7 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		9CF8F35B2F7C128A00D428A7 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9CF497762F770A7300F57BCE /* Project object */;
 }
