@@ -1,9 +1,3 @@
-//
-//  SonexTab.swift
-//  SonexShared
-//
-//  Created by Ricardo Payares on 3/31/26.
-//
 
 import SwiftUI
 
@@ -36,7 +30,6 @@ public enum SonexTab: String, CaseIterable, Identifiable {
         }
     }
 
-//    public var isPrimary: Bool { self == .scan }
 
     public init() { self = .collection }
 }
