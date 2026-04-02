@@ -11,19 +11,19 @@ import SwiftUI
 struct ScanTabView: View {
     var body: some View {
         ZStack {
-            Color.gray.ignoresSafeArea()
+            Color.sonexCharcoal.ignoresSafeArea()
             VStack(spacing: 16) {
                 // Pulsing ring to suggest the NFC scan animation
                 ZStack {
                     Circle()
-                        .strokeBorder(Color.red.opacity(0.15), lineWidth: 1)
+                        .strokeBorder(Color.sonexAmber.opacity(0.15), lineWidth: 1)
                         .frame(width: 120, height: 120)
                     Circle()
-                        .strokeBorder(Color.red.opacity(0.35), lineWidth: 1.5)
+                        .strokeBorder(Color.sonexAmber.opacity(0.35), lineWidth: 1.5)
                         .frame(width: 80, height: 80)
                     Image(systemName: "wave.3.right.circle.fill")
                         .font(.system(size: 36))
-                        .foregroundStyle(Color.red)
+                        .foregroundStyle(Color.sonexAmber)
                 }
                 Text("Tap to Scan")
                     .font(.headline)

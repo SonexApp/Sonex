@@ -12,20 +12,19 @@ import SonexShared
 struct SonexApp: App {
 
     @State private var router = TabRouter()
-    @State private var supabaseManager = SupabaseManager.shared
+    @State private var dbManager = SonexDBManager.shared
     @State private var nfcManager = NFCManager()
 
     var body: some Scene {
         WindowGroup {
             Group {
-                if supabaseManager.isAuthenticated {
+                if dbManager.isAuthenticated {
                     RootView()
                 } else {
                     AuthView()
                 }
             }
             .environment(router)
-            .environment(supabaseManager)
             .environment(nfcManager)
             .preferredColorScheme(.dark)
             .tint(Color.sonexAmber)

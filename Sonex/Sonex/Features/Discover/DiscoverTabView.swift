@@ -11,11 +11,11 @@ import SwiftUI
 struct DiscoverTabView: View {
     var body: some View {
         ZStack {
-            Color.gray.ignoresSafeArea()
+            Color.sonexCharcoal.ignoresSafeArea()
             VStack(spacing: 12) {
                 Image(systemName: "map.fill")
                     .font(.system(size: 36))
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(Color.sonexAmber)
                 Text("Discover")
                     .font(.headline)
                     .foregroundStyle(.white)

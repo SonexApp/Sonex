@@ -11,7 +11,7 @@ import SonexShared
 struct RootView: View {
 
     @Environment(TabRouter.self) private var router
-    @Environment(SupabaseManager.self) private var supabaseManager
+    private let dbManager = SonexDBManager.shared
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -34,7 +34,7 @@ struct RootView: View {
         .onOpenURL { url in
             handleIncomingURL(url)
         }
-        .onChange(of: supabaseManager.isAuthenticated) { _, isAuthenticated in
+        .onChange(of: dbManager.isAuthenticated) { _, isAuthenticated in
             if !isAuthenticated {
                 router.navigate(to: .collection)
             }

@@ -1,0 +1,19 @@
+# Xcode
+xcuserdata/
+DerivedData/
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# ⚠️  API Keys — never commit this file
+# Each developer adds their own copy locally
+Sonex/sonex.xcconfig
+.agends/
+.claude/

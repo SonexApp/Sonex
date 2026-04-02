@@ -11,11 +11,11 @@ import SwiftUI
 struct CollectionTabView: View {
     var body: some View {
         ZStack {
-            Color.gray.ignoresSafeArea()
+            Color.sonexCharcoal.ignoresSafeArea()
             VStack(spacing: 12) {
                 Image(systemName: "square.stack.3d.up.fill")
                     .font(.system(size: 36))
-                    .foregroundStyle(Color.red)
+                    .foregroundStyle(Color.sonexAmber)
                 Text("Crates")
                     .font(.headline)
                     .foregroundStyle(.white)

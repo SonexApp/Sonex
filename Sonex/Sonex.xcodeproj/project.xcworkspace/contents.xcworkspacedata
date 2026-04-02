@@ -4,4 +4,10 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:sonex.xcconfig">
+   </FileRef>
+   <FileRef
+      location = "group:ConfigurationErrorView.swift">
+   </FileRef>
 </Workspace>

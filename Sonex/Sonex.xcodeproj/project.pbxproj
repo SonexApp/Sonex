@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9CCCA7892F7DBFA600E9DEFB /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 9CCCA7882F7DBFA600E9DEFB /* Supabase */; };
 		9CF4979C2F770AD000F57BCE /* Sonex Clip View.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 9CF497902F770ACF00F57BCE /* Sonex Clip View.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9CF8F31D2F7C0E3E00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31C2F7C0E3E00D428A7 /* SonexShared */; };
 		9CF8F3202F7C0E9C00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31F2F7C0E9C00D428A7 /* SonexShared */; };
@@ -78,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CCCA7892F7DBFA600E9DEFB /* Supabase in Frameworks */,
 				9CF8F35C2F7C128A00D428A7 /* Storage in Frameworks */,
 				9CF8F3582F7C128A00D428A7 /* PostgREST in Frameworks */,
 				9CF8F3562F7C128A00D428A7 /* Functions in Frameworks */,
@@ -153,6 +155,7 @@
 				9CF8F3572F7C128A00D428A7 /* PostgREST */,
 				9CF8F3592F7C128A00D428A7 /* Realtime */,
 				9CF8F35B2F7C128A00D428A7 /* Storage */,
+				9CCCA7882F7DBFA600E9DEFB /* Supabase */,
 			);
 			productName = Sonex;
 			productReference = 9CF4977E2F770A7300F57BCE /* Sonex.app */;
@@ -319,6 +322,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -377,6 +381,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -397,6 +402,7 @@
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -429,6 +435,7 @@
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -572,6 +579,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		9CCCA7882F7DBFA600E9DEFB /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9CF8F3522F7C128A00D428A7 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
 		9CF8F31C2F7C0E3E00D428A7 /* SonexShared */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SonexShared;

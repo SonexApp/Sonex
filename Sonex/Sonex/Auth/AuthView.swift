@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct AuthView: View {
-
-    @Environment(SupabaseManager.self) private var supabaseManager
+    
+    // Use the singleton instead of Environment
+    private let dbManager = SonexDBManager.shared
 
     @State private var email = ""
     @State private var password = ""
+    @State private var confirmPassword = ""
     @State private var isLoading = false
     @State private var errorMessage: String? = nil
+    @State private var isSignUpMode = false
 
     var body: some View {
         ZStack {
@@ -32,7 +35,7 @@ struct AuthView: View {
                         .font(.system(size: 34, weight: .semibold, design: .serif))
                         .foregroundStyle(.white)
 
-                    Text("Vinyl cataloging and peer exchange")
+                    Text(isSignUpMode ? "Join the vinyl community" : "Vinyl cataloging and peer exchange")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.4))
                 }
@@ -49,10 +52,31 @@ struct AuthView: View {
 
                     SecureField("Password", text: $password)
                         .sonexFieldStyle()
-                        .textContentType(.password)
+                        .textContentType(isSignUpMode ? .newPassword : .password)
+                    
+                    if isSignUpMode {
+                        SecureField("Confirm Password", text: $confirmPassword)
+                            .sonexFieldStyle()
+                            .textContentType(.newPassword)
+                            .overlay(alignment: .trailing) {
+                                if !confirmPassword.isEmpty {
+                                    Image(systemName: passwordsMatch ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundStyle(passwordsMatch ? .green : .red)
+                                        .padding(.trailing, 14)
+                                }
+                            }
+                    }
                 }
                 .padding(.horizontal, 32)
 
+                // Validation Messages
+                if isSignUpMode && !confirmPassword.isEmpty && !passwordsMatch {
+                    Text("Passwords do not match")
+                        .font(.caption)
+                        .foregroundStyle(Color.red.opacity(0.8))
+                        .padding(.horizontal, 32)
+                }
+                
                 // Error
                 if let errorMessage {
                     Text(errorMessage)
@@ -62,16 +86,22 @@ struct AuthView: View {
                         .padding(.horizontal, 32)
                 }
 
-                // Sign in
+                // Primary Action Button
                 Button {
-                    Task { await signIn() }
+                    Task { 
+                        if isSignUpMode {
+                            await signUp()
+                        } else {
+                            await signIn()
+                        }
+                    }
                 } label: {
                     Group {
                         if isLoading {
                             ProgressView()
                                 .tint(.black)
                         } else {
-                            Text("Sign In")
+                            Text(isSignUpMode ? "Sign Up" : "Sign In")
                                 .font(.system(size: 16, weight: .semibold))
                         }
                     }
@@ -82,22 +112,90 @@ struct AuthView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
                 .padding(.horizontal, 32)
-                .disabled(isLoading || email.isEmpty || password.isEmpty)
+                .disabled(isFormInvalid || isLoading)
+                
+                // Toggle between Sign In and Sign Up
+                Button {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isSignUpMode.toggle()
+                        errorMessage = nil
+                        clearFields()
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(isSignUpMode ? "Already have an account?" : "Don't have an account?")
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text(isSignUpMode ? "Sign In" : "Sign Up")
+                            .foregroundStyle(Color.sonexAmber)
+                    }
+                    .font(.system(size: 14, weight: .medium))
+                }
+                .padding(.top, 12)
 
                 Spacer()
             }
         }
     }
+    
+    // MARK: - Computed Properties
+    
+    private var isFormInvalid: Bool {
+        if isSignUpMode {
+            return email.isEmpty || password.isEmpty || confirmPassword.isEmpty || !passwordsMatch
+        } else {
+            return email.isEmpty || password.isEmpty
+        }
+    }
+    
+    private var passwordsMatch: Bool {
+        password == confirmPassword
+    }
+    
+    // MARK: - Methods
 
     private func signIn() async {
         isLoading = true
         errorMessage = nil
         do {
-            try await supabaseManager.signIn(email: email, password: password)
+            _ = try await dbManager.signIn(email: email, password: password)
+            // Session is automatically cached in the dbManager
         } catch {
             errorMessage = error.localizedDescription
         }
         isLoading = false
+    }
+    
+    private func signUp() async {
+        isLoading = true
+        errorMessage = nil
+        
+        // Validate passwords match
+        guard passwordsMatch else {
+            errorMessage = "Passwords do not match"
+            isLoading = false
+            return
+        }
+        
+        // Validate password strength (optional)
+        guard password.count >= 6 else {
+            errorMessage = "Password must be at least 6 characters"
+            isLoading = false
+            return
+        }
+        
+        do {
+            _ = try await dbManager.signUpWithEmail(email: email, password: password)
+            // Session is automatically cached in the dbManager if signup includes immediate sign-in
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    
+    private func clearFields() {
+        email = ""
+        password = ""
+        confirmPassword = ""
     }
 }
 
