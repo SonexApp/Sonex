@@ -1,24 +1,23 @@
 import Foundation
 
+// MARK: - Exchange
 
-// MARK: Exchange
 struct Exchange: Codable, Identifiable {
-    let id: UUID
-    let sellerID: UserID?
-    let buyerID: UserID?
-    let recordIDs: [RecordID]
-    let totalPrice: Decimal?
-    let status: ExchangeStatus
-    let qrSession: String?
-    let completedAt: Date?
+    let id: String
+    let sellerId: String
+    let buyerId: String
+    var recordIds: [String]
+    var totalPrice: Double?
+    var status: ExchangeStatus
+    var qrSession: String?
+    var completedAt: String?
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case sellerID    = "seller_id"
-        case buyerID     = "buyer_id"
-        case recordIDs   = "record_ids"
+        case id, status
+        case sellerId    = "seller_id"
+        case buyerId     = "buyer_id"
+        case recordIds   = "record_ids"
         case totalPrice  = "total_price"
-        case status
         case qrSession   = "qr_session"
         case completedAt = "completed_at"
     }

@@ -58,7 +58,7 @@ struct RootView: View {
             url.pathComponents[1] == "tag"
         else { return }
 
-        let tagHash = url.pathComponents[2]
+        let _ = url.pathComponents[2]
         router.navigate(to: .scan)
         // NFCManager picks up the hash and resolves it
         // without requiring a physical tap

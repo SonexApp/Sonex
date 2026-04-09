@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+internal import Auth
+import SonexShared
 
 struct AuthView: View {
     
@@ -18,6 +20,9 @@ struct AuthView: View {
     @State private var isLoading = false
     @State private var errorMessage: String? = nil
     @State private var isSignUpMode = false
+    @State private var showProfileCreation = false
+    @State private var profileCreationCompleted = false
+    @State private var showEmailConfirmation = false
 
     var body: some View {
         ZStack {
@@ -91,6 +96,7 @@ struct AuthView: View {
                     Task { 
                         if isSignUpMode {
                             await signUp()
+                            isSignUpMode.toggle()
                         } else {
                             await signIn()
                         }
@@ -135,6 +141,29 @@ struct AuthView: View {
                 Spacer()
             }
         }
+        .sheet(isPresented: $showProfileCreation) {
+            ProfileCreationView {
+                showProfileCreation = false
+                profileCreationCompleted = true
+            }
+        }
+        .sheet(isPresented: $showEmailConfirmation) {
+            EmailConfirmationView(email: email) {
+                showEmailConfirmation = false
+            }
+        }
+        .onChange(of: dbManager.isAuthenticated) { oldValue, newValue in
+            if newValue && !oldValue && !showProfileCreation {
+                // User just got authenticated (likely from email confirmation)
+                // Check if they need to complete profile creation
+                Task {
+                    await checkAndShowProfileCreation()
+                }
+            }
+        }
+        .onOpenURL { url in
+            handleIncomingURL(url)
+        }
     }
     
     // MARK: - Computed Properties
@@ -153,12 +182,38 @@ struct AuthView: View {
     
     // MARK: - Methods
 
+    private func checkAndShowProfileCreation() async {
+        do {
+            // Try to fetch the current user profile
+            _ = try await dbManager.fetchCurrentUser()
+            // If we get here, user already has a profile, don't show creation
+            print("User already has a profile, skipping profile creation")
+        } catch {
+            // User doesn't have a profile yet, show profile creation
+            print("User needs to create a profile: \(error)")
+            await MainActor.run {
+                showProfileCreation = true
+            }
+        }
+    }
+
+    private func handleIncomingURL(_ url: URL) {
+        // Handle authentication callback URLs
+        if url.scheme == "sonex" && url.host == "auth-callback" {
+            // Supabase automatically handles the callback and updates the session
+            // The authentication state changes will be picked up by the auth listener
+            // in SonexDBManager, which will trigger the onChange modifier below
+            print("Received authentication callback URL: \(url)")
+        }
+    }
+
     private func signIn() async {
         isLoading = true
         errorMessage = nil
         do {
             _ = try await dbManager.signIn(email: email, password: password)
             // Session is automatically cached in the dbManager
+            
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -168,6 +223,8 @@ struct AuthView: View {
     private func signUp() async {
         isLoading = true
         errorMessage = nil
+        // Reset profile creation state for new sign-ups
+        profileCreationCompleted = false
         
         // Validate passwords match
         guard passwordsMatch else {
@@ -184,8 +241,17 @@ struct AuthView: View {
         }
         
         do {
-            _ = try await dbManager.signUpWithEmail(email: email, password: password)
-            // Session is automatically cached in the dbManager if signup includes immediate sign-in
+            let authResponse = try await dbManager.signUpWithEmail(email: email, password: password)
+            print("Auth response: \(authResponse)")
+            // Check if the user was automatically signed in after signup
+            if authResponse.session != nil {
+                // User is signed in, show profile creation
+                showProfileCreation = true
+            } else {
+                // User needs to verify email first
+                showEmailConfirmation = true
+            }
+            
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -196,6 +262,8 @@ struct AuthView: View {
         email = ""
         password = ""
         confirmPassword = ""
+        // Reset profile creation state for new sign-ups
+        profileCreationCompleted = false
     }
 }
 
@@ -214,3 +282,123 @@ private extension View {
             }
     }
 }
+
+// MARK: - Email Confirmation View
+
+struct EmailConfirmationView: View {
+    let email: String
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.sonexCharcoal.ignoresSafeArea()
+                
+                VStack(spacing: 32) {
+                    Spacer()
+                    
+                    // Icon and Title
+                    VStack(spacing: 16) {
+                        Image(systemName: "envelope.circle.fill")
+                            .font(.system(size: 64))
+                            .foregroundStyle(Color.sonexAmber)
+                        
+                        Text("Check your email")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.white)
+                    }
+                    
+                    // Message
+                    VStack(spacing: 12) {
+                        Text("We've sent a confirmation link to:")
+                            .font(.body)
+                            .foregroundStyle(.white.opacity(0.8))
+                            .multilineTextAlignment(.center)
+                        
+                        Text(email)
+                            .font(.headline)
+                            .foregroundStyle(Color.sonexAmber)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Click the link in the email to verify your account and complete signup.")
+                            .font(.body)
+                            .foregroundStyle(.white.opacity(0.6))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 16)
+                    }
+                    
+                    Spacer()
+                    
+                    // Done Button
+                    Button {
+                        onDismiss()
+                    } label: {
+                        Text("Got it")
+                            .font(.system(size: 16, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(Color.sonexAmber)
+                            .foregroundStyle(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    }
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 32)
+                }
+            }
+            .navigationTitle("Email Sent")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        onDismiss()
+                    }
+                    .foregroundStyle(Color.sonexAmber)
+                }
+            }
+        }
+    }
+}
+// MARK: - String Extension
+
+private extension String {
+    func trim() -> String {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+// MARK: - Preview
+
+#Preview("Sign In") {
+    AuthView()
+}
+
+#Preview("Sign Up") {
+    struct PreviewWrapper: View {
+        @State private var authView = AuthView()
+        
+        var body: some View {
+            authView
+                .onAppear {
+                    // Access the private state using reflection or a test helper
+                    // For now, users can tap the "Sign Up" button in the preview
+                }
+        }
+    }
+    
+    return PreviewWrapper()
+}
+
+#Preview("Email Confirmation") {
+    EmailConfirmationView(email: "user@example.com") {
+        print("Dismissed")
+    }
+}
+
+#Preview("Profile Creation") {
+    ProfileCreationView {
+        print("Profile created")
+    }
+}
+

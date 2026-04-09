@@ -8,25 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		9CCCA7892F7DBFA600E9DEFB /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 9CCCA7882F7DBFA600E9DEFB /* Supabase */; };
-		9CF4979C2F770AD000F57BCE /* Sonex Clip View.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 9CF497902F770ACF00F57BCE /* Sonex Clip View.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9CF8F31D2F7C0E3E00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31C2F7C0E3E00D428A7 /* SonexShared */; };
-		9CF8F3202F7C0E9C00D428A7 /* SonexShared in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F31F2F7C0E9C00D428A7 /* SonexShared */; };
 		9CF8F3542F7C128A00D428A7 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3532F7C128A00D428A7 /* Auth */; };
 		9CF8F3562F7C128A00D428A7 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3552F7C128A00D428A7 /* Functions */; };
 		9CF8F3582F7C128A00D428A7 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3572F7C128A00D428A7 /* PostgREST */; };
 		9CF8F35A2F7C128A00D428A7 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F3592F7C128A00D428A7 /* Realtime */; };
 		9CF8F35C2F7C128A00D428A7 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF8F35B2F7C128A00D428A7 /* Storage */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		9CF4979A2F770AD000F57BCE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9CF497762F770A7300F57BCE /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9CF4978F2F770ACF00F57BCE;
-			remoteInfo = "Sonex Clip View";
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		9CF497A12F770AD000F57BCE /* Embed App Clips */ = {
@@ -35,7 +23,6 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
 			dstSubfolderSpec = 16;
 			files = (
-				9CF4979C2F770AD000F57BCE /* Sonex Clip View.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,31 +31,30 @@
 
 /* Begin PBXFileReference section */
 		9CF4977E2F770A7300F57BCE /* Sonex.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sonex.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9CF497902F770ACF00F57BCE /* Sonex Clip View.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sonex Clip View.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CF8F31A2F7C0D5600D428A7 /* SonexShared */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SonexShared; path = ../SonexShared; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9CF4979D2F770AD000F57BCE /* Exceptions for "Sonex Clip View" folder in "Sonex Clip View" target */ = {
+		9CCCA8BB2F84586200E9DEFB /* Exceptions for "Sonex" folder in "Sonex" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 9CF4978F2F770ACF00F57BCE /* Sonex Clip View */;
+			target = 9CF4977D2F770A7300F57BCE /* Sonex */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9CF497802F770A7300F57BCE /* Sonex */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				9CCCA8BB2F84586200E9DEFB /* Exceptions for "Sonex" folder in "Sonex" target */,
+			);
 			path = Sonex;
 			sourceTree = "<group>";
 		};
 		9CF497912F770ACF00F57BCE /* Sonex Clip View */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				9CF4979D2F770AD000F57BCE /* Exceptions for "Sonex Clip View" folder in "Sonex Clip View" target */,
-			);
 			path = "Sonex Clip View";
 			sourceTree = "<group>";
 		};
@@ -86,14 +72,6 @@
 				9CF8F3542F7C128A00D428A7 /* Auth in Frameworks */,
 				9CF8F35A2F7C128A00D428A7 /* Realtime in Frameworks */,
 				9CF8F31D2F7C0E3E00D428A7 /* SonexShared in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9CF4978D2F770ACF00F57BCE /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9CF8F3202F7C0E9C00D428A7 /* SonexShared in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +93,6 @@
 			isa = PBXGroup;
 			children = (
 				9CF4977E2F770A7300F57BCE /* Sonex.app */,
-				9CF497902F770ACF00F57BCE /* Sonex Clip View.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,7 +119,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				9CF4979B2F770AD000F57BCE /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9CF497802F770A7300F57BCE /* Sonex */,
@@ -161,29 +137,6 @@
 			productReference = 9CF4977E2F770A7300F57BCE /* Sonex.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9CF4978F2F770ACF00F57BCE /* Sonex Clip View */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9CF4979E2F770AD000F57BCE /* Build configuration list for PBXNativeTarget "Sonex Clip View" */;
-			buildPhases = (
-				9CF4978C2F770ACF00F57BCE /* Sources */,
-				9CF4978D2F770ACF00F57BCE /* Frameworks */,
-				9CF4978E2F770ACF00F57BCE /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				9CF497912F770ACF00F57BCE /* Sonex Clip View */,
-			);
-			name = "Sonex Clip View";
-			packageProductDependencies = (
-				9CF8F31F2F7C0E9C00D428A7 /* SonexShared */,
-			);
-			productName = "Sonex Clip View";
-			productReference = 9CF497902F770ACF00F57BCE /* Sonex Clip View.app */;
-			productType = "com.apple.product-type.application.on-demand-install-capable";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -195,9 +148,6 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					9CF4977D2F770A7300F57BCE = {
-						CreatedOnToolsVersion = 26.0.1;
-					};
-					9CF4978F2F770ACF00F57BCE = {
 						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
@@ -221,20 +171,12 @@
 			projectRoot = "";
 			targets = (
 				9CF4977D2F770A7300F57BCE /* Sonex */,
-				9CF4978F2F770ACF00F57BCE /* Sonex Clip View */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		9CF4977C2F770A7300F57BCE /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		9CF4978E2F770ACF00F57BCE /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -251,22 +193,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9CF4978C2F770ACF00F57BCE /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		9CF4979B2F770AD000F57BCE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9CF4978F2F770ACF00F57BCE /* Sonex Clip View */;
-			targetProxy = 9CF4979A2F770AD000F57BCE /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		9CF497872F770A7400F57BCE /* Debug */ = {
@@ -323,7 +250,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -382,7 +309,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_FILE = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -397,13 +324,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Sonex/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "Scan nfc to connect vinyl";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -413,8 +342,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.Sonex;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.SonexTeamApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -430,13 +360,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8VNY625MD3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = Sonex/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "Scan nfc to connect vinyl";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -446,78 +378,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.Sonex;
+				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.SonexTeamApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		9CF4979F2F770AD000F57BCE /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Sonex Clip View/Sonex_Clip_View.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8VNY625MD3;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sonex Clip View/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Sonex;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.Sonex.Clip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		9CF497A02F770AD000F57BCE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "Sonex Clip View/Sonex_Clip_View.entitlements";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8VNY625MD3;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Sonex Clip View/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Sonex;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.IYA.Capstone.Sonex.Clip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -545,15 +408,6 @@
 			buildConfigurations = (
 				9CF4978A2F770A7400F57BCE /* Debug */,
 				9CF4978B2F770A7400F57BCE /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		9CF4979E2F770AD000F57BCE /* Build configuration list for PBXNativeTarget "Sonex Clip View" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9CF4979F2F770AD000F57BCE /* Debug */,
-				9CF497A02F770AD000F57BCE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -586,11 +440,6 @@
 		};
 		9CF8F31C2F7C0E3E00D428A7 /* SonexShared */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = SonexShared;
-		};
-		9CF8F31F2F7C0E9C00D428A7 /* SonexShared */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9CF8F31B2F7C0E3E00D428A7 /* XCLocalSwiftPackageReference "../SonexShared" */;
 			productName = SonexShared;
 		};
 		9CF8F3532F7C128A00D428A7 /* Auth */ = {

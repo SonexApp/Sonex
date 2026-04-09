@@ -10,20 +10,20 @@ import Foundation
 
 // MARK: - Shared Typealiases
 
-typealias RecordID = UUID
-typealias UserID   = UUID
+public typealias RecordID = UUID
+public typealias UserID   = UUID
 
 // MARK: - SUPPORTING TYPES
 
 // MARK: PostGISPoint
 // Supabase returns PostGIS geography as GeoJSON from .select()
 // Use ST_AsGeoJSON() or the geography column directly depending on client config
-struct PostGISPoint: Codable, Hashable {
+public struct PostGISPoint: Codable, Hashable {
     let longitude: Double
     let latitude: Double
 
     // Decodes from GeoJSON: { "type": "Point", "coordinates": [lng, lat] }
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: GeoJSONCodingKeys.self)
         let coordinates = try container.decode([Double].self, forKey: .coordinates)
         guard coordinates.count >= 2 else {
@@ -37,7 +37,7 @@ struct PostGISPoint: Codable, Hashable {
         self.latitude  = coordinates[1]
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: GeoJSONCodingKeys.self)
         try container.encode("Point", forKey: .type)
         try container.encode([longitude, latitude], forKey: .coordinates)
@@ -69,14 +69,78 @@ struct AnyCodable: Codable {
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: _DynamicKey.self)
-        _ = container // jsonb passthrough — override as needed
-    }
-
-    private struct _DynamicKey: CodingKey {
-        var stringValue: String
-        var intValue: Int? { nil }
-        init?(stringValue: String) { self.stringValue = stringValue }
-        init?(intValue: Int) { return nil }
+        var container = encoder.singleValueContainer()
+        switch value {
+        case let v as Int:              try container.encode(v)
+        case let v as Double:           try container.encode(v)
+        case let v as Bool:             try container.encode(v)
+        case let v as String:           try container.encode(v)
+        case let v as [Any]:            try container.encode(v.map { AnyCodable($0) })
+        case let v as [String: Any]:    try container.encode(v.mapValues { AnyCodable($0) })
+        default:                        try container.encodeNil()
+        }
     }
 }
+
+
+//payload structs
+
+// MARK: - Payload Structs
+
+struct UserProfilePayload: Encodable {
+    var username: String
+    var displayName: String?
+
+    enum CodingKeys: String, CodingKey {
+        case username
+        case displayName = "display_name"
+    }
+}
+
+struct ProfileUpdatePayload: Encodable {
+    var username: String?
+    var displayName: String?
+    var avatarUrl: String?
+    var bio: String?
+
+    enum CodingKeys: String, CodingKey {
+        case username
+        case displayName = "display_name"
+        case avatarUrl  = "avatar_url"
+        case bio
+    }
+}
+
+struct VinylEntryPayload: Encodable {
+    var ownerId: String
+    var title: String
+    var artist: String
+    var crateId: String
+    var discogsId: String?
+    var nfcTagHash: String?
+    var label: String?
+    var year: Int?
+    var pressing: String?
+    var format: String?
+    var grade: String?
+    var gradeNotes: String?
+    var coverArtUrl: String?
+    var audioNoteUrl: String?
+    var forSale: Bool = false
+    var askingPrice: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case ownerId      = "owner_id"
+        case title, artist
+        case crateId      = "crate_id"
+        case discogsId    = "discogs_id"
+        case nfcTagHash   = "nfc_tag_hash"
+        case label, year, pressing, format, grade
+        case gradeNotes   = "grade_notes"
+        case coverArtUrl  = "cover_art_url"
+        case audioNoteUrl = "audio_note_url"
+        case forSale      = "for_sale"
+        case askingPrice  = "asking_price"
+    }
+}
+

@@ -1,31 +1,25 @@
 import Foundation
+// MARK: - Discover Post
 
-// MARK: DiscoverPost
 struct DiscoverPost: Codable, Identifiable {
-    let id: UUID
-    let authorID: UserID?
-    let type: DiscoverPostType
-    let title: String?
-    let description: String?
-    let location: PostGISPoint?
-    let address: String?
-    let metadata: [String: AnyCodable]?
-    let active: Bool
-    let expiresAt: Date?
-    let createdAt: Date
+    let id: String
+    let authorId: String
+    var type: DiscoverPostType
+    var title: String?
+    var description: String?
+    var location: SonexLocation?
+    var address: String?
+    var metadata: [String: AnyCodable]?
+    var active: Bool
+    var expiresAt: String?
+    let createdAt: String?
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case authorID   = "author_id"
-        case type
-        case title
-        case description
-        case location
-        case address
-        case metadata
-        case active
-        case expiresAt  = "expires_at"
-        case createdAt  = "created_at"
+        case id, type, title, description, location, address, metadata, active
+        case authorId  = "author_id"
+        case expiresAt = "expires_at"
+        case createdAt = "created_at"
     }
 }
+
 

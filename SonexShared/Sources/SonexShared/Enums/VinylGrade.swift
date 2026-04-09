@@ -1,6 +1,6 @@
 
 // MARK: VinylGrade (Goldmine standard)
-enum VinylGrade: String, Codable, CaseIterable, Identifiable {
+public enum VinylGrade: String, Codable, CaseIterable, Identifiable {
     case mint            = "M"
     case nearMint        = "NM"
     case veryGoodPlus    = "VG+"
@@ -10,9 +10,9 @@ enum VinylGrade: String, Codable, CaseIterable, Identifiable {
     case fair            = "F"
     case poor            = "P"
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .mint:         return "Mint"
         case .nearMint:     return "Near Mint"

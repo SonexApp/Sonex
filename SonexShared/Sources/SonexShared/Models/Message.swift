@@ -1,25 +1,27 @@
 import Foundation
 
 
-// MARK: Message
+// MARK: - Message
+
 struct Message: Codable, Identifiable {
-    let id: UUID
-    let threadID: UUID
-    let senderID: UserID?
-    let body: String?
-    let offerAmount: Decimal?
-    let offerStatus: OfferStatus?
-    let recordID: RecordID?
-    let createdAt: Date
+    let id: String
+    let threadId: String
+    let exchangeId: String
+    let senderId: String
+    var body: String?
+    var offerAmount: Double?
+    var offerStatus: OfferStatus?
+    var recordId: String?
+    let createdAt: String?
 
     enum CodingKeys: String, CodingKey {
-        case id
-        case threadID    = "thread_id"
-        case senderID    = "sender_id"
-        case body
-        case offerAmount = "offer_amount"
-        case offerStatus = "offer_status"
-        case recordID    = "record_id"
-        case createdAt   = "created_at"
+        case id, body
+        case threadId     = "thread_id"
+        case exchangeId   = "exchange_id"
+        case senderId     = "sender_id"
+        case offerAmount  = "offer_amount"
+        case offerStatus  = "offer_status"
+        case recordId     = "record_id"
+        case createdAt    = "created_at"
     }
 }
