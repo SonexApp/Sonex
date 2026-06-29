@@ -1,12 +1,15 @@
-# Sonex - 4-5 Week Development Sprint Technical Plan
+# Sonex App - 2026 USC Capstone
+
+## Screenshots
 
 <img width="201" height="437" alt="1" src="https://github.com/user-attachments/assets/4b5c7bf8-5cf7-4364-a46c-4ca78628ba24" />
 <img width="201" height="437" alt="2" src="https://github.com/user-attachments/assets/9faea51e-a29b-4812-a940-f066e16366fd" />
 <img width="201" height="437" alt="3" src="https://github.com/user-attachments/assets/5e942c27-754c-4e5f-9c4e-aa3d777a8e5a" />
 <img width="201" height="437" alt="4" src="https://github.com/user-attachments/assets/5f7b914c-21bb-4d20-bdd8-30383a4ec606" />
 
+## Implementation Plan
 
-## Week 1 -  Foundations & Data Layer
+### Week 1 -  Foundations & Data Layer
 ***Goal:*** App runs, auth works, solid data layer, dock navigation
 
  - Xcode setup, targets, packages, shared models
@@ -19,7 +22,7 @@
 ***End of week deliverable*** You can log in, you can see your crates list poulated from supabase, and switch tabs with no rerenders
    
 
-## Week 2 - NFC + Registration Flow + Collection View
+### Week 2 - NFC + Registration Flow + Collection View
 ***Goal*** The core cataloging loop works end to end
  - NFC Manager: tag UID extraction -> SHA-256 hash -> supabase lookup (registered vs new)
  - CrateSceneView: SCNView milk crate wall, tap → sheet, UIViewRepresentable bridge
@@ -30,7 +33,7 @@
 
 ***End of week deliverable*** Tap and NFC tag -> register a record -> it appears in your crate. Search for an album -> crate highlights if in collection
 
-## Week 3 - Discover map + Exchange + Messages
+### Week 3 - Discover map + Exchange + Messages
 ***Goal*** Social and transactional features working
  - DiscoverMapView: MapKit pins for all 4 categories, filter bar, PostGIS geo query via Supabase RPC
  - Activity log sheet: Supabase realtime subscription to discover_posts, renders feed, tap-to-focus pin
