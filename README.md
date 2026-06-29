@@ -1,5 +1,11 @@
 # Sonex - 4-5 Week Development Sprint Technical Plan
 
+<img width="201" height="437" alt="1" src="https://github.com/user-attachments/assets/4b5c7bf8-5cf7-4364-a46c-4ca78628ba24" />
+<img width="201" height="437" alt="2" src="https://github.com/user-attachments/assets/9faea51e-a29b-4812-a940-f066e16366fd" />
+<img width="201" height="437" alt="3" src="https://github.com/user-attachments/assets/5e942c27-754c-4e5f-9c4e-aa3d777a8e5a" />
+<img width="201" height="437" alt="4" src="https://github.com/user-attachments/assets/5f7b914c-21bb-4d20-bdd8-30383a4ec606" />
+
+
 ## Week 1 -  Foundations & Data Layer
 ***Goal:*** App runs, auth works, solid data layer, dock navigation
 
