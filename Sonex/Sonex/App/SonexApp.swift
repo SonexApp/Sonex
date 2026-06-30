@@ -14,6 +14,7 @@ struct SonexApp: App {
     @State private var router = TabRouter()
     @State private var dbManager = SonexDBManager.shared
     @State private var nfcManager = NFCManager()
+    @State private var backgroundNFCManager = BackgroundNFCManager.shared
 
     var body: some Scene {
         WindowGroup {
@@ -28,6 +29,11 @@ struct SonexApp: App {
             .environment(nfcManager)
             .preferredColorScheme(.dark)
             .tint(Color.sonexAmber)
+            .onOpenURL { url in
+                print("🚀 App-level URL handler called with: \(url)")
+                // Handle background NFC launches at the app level
+                backgroundNFCManager.handleBackgroundNFCLaunch(with: url)
+            }
         }
     }
 }

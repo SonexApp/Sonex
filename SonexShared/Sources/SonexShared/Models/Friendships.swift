@@ -1,12 +1,15 @@
 import Foundation
 
+// MARK: - UserID Typealias (if not already defined)
+//public typealias UserID = String
+
 // MARK: Friendship
-struct Friendship: Codable, Identifiable {
-    let id: UUID
-    let requesterID: UserID?
-    let addresseeID: UserID?
-    let status: FriendshipStatus
-    let createdAt: Date
+public struct Friendship: Codable, Identifiable {
+    public let id: UUID
+    public let requesterID: UserID?
+    public let addresseeID: UserID?
+    public let status: FriendshipStatus
+    public let createdAt: Date
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -14,5 +17,18 @@ struct Friendship: Codable, Identifiable {
         case addresseeID = "addressee_id"
         case status
         case createdAt   = "created_at"
+    }
+    
+    // Helper properties for following system
+    var isFollowing: Bool {
+        return status == .following || status == .accepted
+    }
+    
+    var isPending: Bool {
+        return status == .pending
+    }
+    
+    var isBlocked: Bool {
+        return status == .blocked
     }
 }

@@ -13,7 +13,6 @@ struct PricingView: View {
     @State private var dbManager = SonexDBManager.shared
     @State private var isRegistering = false
     @FocusState private var isPriceFocused: Bool
-    let onComplete: (VinylEntry) -> Void
     
     var body: some View {
         ScrollView {
@@ -52,7 +51,7 @@ struct PricingView: View {
                                 Circle()
                                     .fill(.white.opacity(0.3))
                                     .frame(width: 4, height: 4)
-                                Text("US 1st pressing")
+//                                Text("US 1st pressing")
                             }
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.5))
@@ -63,50 +62,37 @@ struct PricingView: View {
                 }
                 .padding(.horizontal)
                 
-                // Market Estimate
-                VStack(spacing: 16) {
-                    Text("DISCOGS MARKET ESTIMATE")
-                        .font(.caption)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white.opacity(0.7))
-                    
-                    Text("$185")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.sonexAmber)
-                    
-                    // Price breakdown
-                    HStack(spacing: 24) {
-                        VStack(spacing: 4) {
-                            Text("LAST SALE")
-                                .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.5))
-                            Text("$178")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(Color.sonexAmber)
+                
+                
+                // Collection Type Info Section
+                if registrationData.isWishlist {
+                    VStack(spacing: 8) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "heart.fill")
+                                .font(.title3)
+                                .foregroundStyle(.pink)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("WISHLIST ITEM")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .foregroundStyle(.white.opacity(0.7))
+                                
+                                Text("Adding to Wishlist")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                
+                                Text("This record will be saved to your wishlist for future purchase")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.5))
+                            }
+                            
+                            Spacer()
                         }
-                        
-                        VStack(spacing: 4) {
-                            Text("MEDIAN / AVG")
-                                .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.5))
-                            Text("$182")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                        }
-                        
-                        VStack(spacing: 4) {
-                            Text("SALES / 30D")
-                                .font(.caption2)
-                                .foregroundStyle(.white.opacity(0.5))
-                            Text("47")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.white)
-                        }
+                        .padding()
+                        .background(Color.pink.opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .padding(.horizontal)
                 }
                 
                 // List for Sale Toggle
@@ -120,9 +106,9 @@ struct PricingView: View {
                             
                             Text("List for Sale")
                                 .font(.headline)
-                                .foregroundStyle(.white)
+                                .foregroundStyle(registrationData.isWishlist ? .white.opacity(0.5) : .white)
                             
-                            Text("Other collectors will see this record")
+                            Text(registrationData.isWishlist ? "Not available for wishlist items" : "Other collectors will see this record")
                                 .font(.caption)
                                 .foregroundStyle(.white.opacity(0.5))
                         }
@@ -131,13 +117,14 @@ struct PricingView: View {
                         
                         Toggle("", isOn: $registrationData.forSale)
                             .toggleStyle(SwitchToggleStyle(tint: Color.sonexAmber))
+                            .disabled(registrationData.isWishlist)
                     }
                     .padding()
                     .background(Color.sonexSurface)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     
                     // Price input when listing for sale
-                    if registrationData.forSale {
+                    if registrationData.forSale && !registrationData.isWishlist {
                         VStack(spacing: 12) {
                             HStack {
                                 Text("Your Price")
@@ -147,16 +134,16 @@ struct PricingView: View {
                             }
                             
                             HStack(spacing: 12) {
-                                PriceButton(price: 120, isSelected: registrationData.askingPrice == 120) {
-                                    registrationData.askingPrice = 120
+                                PriceButton(price: 40, isSelected: registrationData.askingPrice == 40) {
+                                    registrationData.askingPrice = 40
                                 }
                                 
-                                PriceButton(price: 185, isSelected: registrationData.askingPrice == 185) {
-                                    registrationData.askingPrice = 185
+                                PriceButton(price: 60, isSelected: registrationData.askingPrice == 60) {
+                                    registrationData.askingPrice = 60
                                 }
                                 
-                                PriceButton(price: 210, isSelected: registrationData.askingPrice == 210) {
-                                    registrationData.askingPrice = 210
+                                PriceButton(price: 80, isSelected: registrationData.askingPrice == 80) {
+                                    registrationData.askingPrice = 80
                                 }
                             }
                             
@@ -198,26 +185,6 @@ struct PricingView: View {
         }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
-                // Accept Offers toggle (shown when listing for sale)
-                if registrationData.forSale {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Accept Offers")
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.white)
-                            Text("Other collectors can make offers below asking")
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.5))
-                        }
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: .constant(true))
-                            .toggleStyle(SwitchToggleStyle(tint: Color.sonexAmber))
-                    }
-                    .padding(.horizontal)
-                }
                 
                 Button(action: {
                     registerVinyl()
@@ -229,7 +196,7 @@ struct PricingView: View {
                                 .scaleEffect(0.8)
                         }
                         
-                        Text(registrationData.forSale ? "Add to Collection & List for Sale" : "Add to Collection")
+                        Text(getButtonText())
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
@@ -260,6 +227,31 @@ struct PricingView: View {
             }
     }
     
+    private func mapToSonexReleaseEdition(_ edition: VinylRegistrationData.ReleaseEdition) -> ReleaseEdition {
+        let mappedEdition: ReleaseEdition
+        switch edition {
+        case .standard:
+            mappedEdition = .standard
+        case .limitedEdition:
+            mappedEdition = .limitedEdition
+        case .reissue:
+            mappedEdition = .reissue
+        }
+        
+        print("🔄 Mapping release edition: '\(edition.rawValue)' -> '\(mappedEdition)'")
+        return mappedEdition
+    }
+    
+    private func getButtonText() -> String {
+        if registrationData.isWishlist {
+            return "Add to Wishlist"
+        } else if registrationData.forSale {
+            return "Add to Collection & List for Sale"
+        } else {
+            return "Add to Collection"
+        }
+    }
+    
     private func registerVinyl() {
         guard !isRegistering else { return }
         
@@ -267,32 +259,65 @@ struct PricingView: View {
         
         Task {
             do {
+                // Debug: Log the release edition before saving
+                let mappedEdition = mapToSonexReleaseEdition(registrationData.releaseEdition)
+                print("💾 About to save vinyl with release edition: '\(mappedEdition.rawValue)'")
+                
+                // Determine which crate to use
+                let targetCrateId: String
+                let crateName: String
+                if registrationData.isWishlist {
+                    targetCrateId = try await dbManager.resolveWishlistCrateId()
+                    crateName = "Wishlist"
+                } else {
+                    // Use unsorted crate for owned items
+                    targetCrateId = try await dbManager.resolveUnsortedCrateId()
+                    crateName = "Unsorted"
+                }
+                
+                print("📦 [registerVinyl] Adding \(registrationData.isWishlist ? "wishlist" : "owned") item to \(crateName) crate")
+                
                 let vinyl = try await dbManager.registerVinyl(
                     title: registrationData.title,
                     artist: registrationData.artist,
+                    crateId: targetCrateId,
+                    discogsId: registrationData.discogsId,
                     nfcTagHash: registrationData.nfcTagHash,
                     label: registrationData.label.isEmpty ? nil : registrationData.label,
                     year: registrationData.year,
                     pressing: registrationData.pressing.isEmpty ? nil : registrationData.pressing,
-                    format: registrationData.format.isEmpty ? nil : registrationData.format,
-                    grade: registrationData.mediaGrade,
+                    format: registrationData.format.isEmpty ? nil : registrationData.format + " " + (registrationData.vinylSize ?? ""),
+                    mediaGrade: registrationData.mediaGrade,
                     gradeNotes: registrationData.gradeNotes.isEmpty ? nil : registrationData.gradeNotes,
                     coverArtUrl: registrationData.coverArtUrl,
                     forSale: registrationData.forSale,
-                    askingPrice: registrationData.askingPrice
+                    askingPrice: registrationData.askingPrice,
+                    catalogNumber: registrationData.catalogNumber.isEmpty ? nil : registrationData.catalogNumber,
+                    matrixCode: registrationData.matrixCode.isEmpty ? nil : registrationData.matrixCode,
+                    barcode: registrationData.barcode.isEmpty ? nil : registrationData.barcode,
+                    releaseEdition: mappedEdition,
+                    editionNotes: registrationData.editionNotes.isEmpty ? nil : registrationData.editionNotes,
+                    sleeveGrade: registrationData.sleeveGrade
                 )
                 
                 await MainActor.run {
-                    onComplete(vinyl)
+                    print("🎵 Successfully registered vinyl: \(vinyl.title)")
+                    print("📄 Current step before nextStep(): \(registrationData.currentStep)")
+                    registrationData.registeredVinyl = vinyl
+                    registrationData.nextStep()
+                    print("📄 Current step after nextStep(): \(registrationData.currentStep)")
                     isRegistering = false
                 }
             } catch {
                 await MainActor.run {
+                    print("❌ Failed to register vinyl: \(error)")
+                    print("📄 Current step during error: \(registrationData.currentStep)")
                     // Handle error - could show alert
-                    print("Failed to register vinyl: \(error)")
                     isRegistering = false
                 }
             }
+            
+            registrationData.nextStep()
         }
     }
 }
@@ -316,7 +341,3 @@ struct PriceButton: View {
     }
 }
 
-#Preview {
-    PricingView(registrationData: VinylRegistrationData()) { _ in }
-        .background(Color.sonexCharcoal)
-}

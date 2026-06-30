@@ -63,12 +63,12 @@ struct ScanTabView: View {
     @ViewBuilder
     private var headerSection: some View {
         VStack(spacing: 8) {
-            Text("Ready to Scan")
+            Text("Ready to Register")
                 .font(.title2)
                 .fontWeight(.semibold)
                 .foregroundStyle(.white)
             
-            Text("Scan the Spin Tag you wish to set up for your media. Then walk through a quick setup to get you graded and listed!")
+            Text("Scan blank Spin Tags to register new vinyl records, or register vinyl without tags. Already registered tags will open album details automatically when tapped outside the app.")
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -80,7 +80,12 @@ struct ScanTabView: View {
     private var nfcScanningSection: some View {
         VStack(spacing: 32) {
             nfcAnimationView
-            scanButton
+            
+            VStack(spacing: 8) {
+                scanButton
+                newVinylButton
+            }
+            
             statusMessagesView
         }
     }
@@ -146,10 +151,24 @@ struct ScanTabView: View {
                 .foregroundStyle(.white.opacity(0.7))
         }
     }
-    
+    @ViewBuilder 
+    private var newVinylButton: some View {
+        Button(action: {
+            // Start registration flow without NFC tag
+            registrationData.reset()
+            registrationData.nfcTagHash = nil
+            showingRegistrationFlow = true
+        }) {
+            Text("or add vinyl without a tag")
+                .font(.subheadline)
+                .foregroundStyle(.white.opacity(0.7))
+                .underline()
+        }
+    }
     @ViewBuilder
     private var scanButton: some View {
         Button(action: {
+            registrationData.reset()
             if nfcManager.isScanning {
                 nfcManager.stopScanning()
             } else {
@@ -165,7 +184,7 @@ struct ScanTabView: View {
     @ViewBuilder
     private var scanButtonContent: some View {
         HStack(spacing: 12) {
-            Image(systemName: nfcManager.isScanning ? "stop.fill" : "nfc")
+            Image(systemName: nfcManager.isScanning ? "stop.fill" : "wave.3.right.circle.fill")
                 .font(.title3)
             
             Text(nfcManager.isScanning ? "Cancel Scan" : "Start Scanning")
@@ -239,12 +258,15 @@ struct ScanTabView: View {
                 let existingVinyl = try await dbManager.checkNFCTagRegistration(tagHash: tagHash)
                 
                 await MainActor.run {
-                    if existingVinyl != nil {
-                        errorMessage = "This tag is already registered to a vinyl record."
+                    if let vinyl = existingVinyl {
+                        // Tag is already registered - show error message
+                        errorMessage = "This tag is already registered to \"\(vinyl.title)\" by \(vinyl.artist). Registered tags can only be read through background NFC detection."
+                        nfcManager.stopScanning()
                     } else {
-                        // Start registration flow
+                        // Start registration flow for blank tag
                         registrationData.nfcTagHash = tagHash
                         showingRegistrationFlow = true
+                        nfcManager.stopScanning()
                     }
                     isCheckingTag = false
                 }
@@ -277,10 +299,18 @@ struct VinylRegistrationFlowView: View {
                 case .grading:
                     GradingView(registrationData: registrationData)
                 case .pricing:
-                    PricingView(registrationData: registrationData, onComplete: onComplete)
+                    PricingView(registrationData: registrationData)
                 case .confirmation:
-                    ConfirmationView(registrationData: registrationData, onComplete: onComplete)
+                    ConfirmationView(
+                        registrationData: registrationData,
+                        onComplete: { vinyl in
+                            onComplete(vinyl)
+                        }
+                    )
                 }
+            }
+            .onChange(of: registrationData.currentStep) { oldValue, newValue in
+                print("🔄 Step changed from \(oldValue) to \(newValue)")
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

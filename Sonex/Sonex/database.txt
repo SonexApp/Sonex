@@ -1,0 +1,119 @@
+
+
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.crates (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  sort_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  for_sale boolean NOT NULL DEFAULT false,
+  owner_id uuid NOT NULL,
+  CONSTRAINT crates_pkey PRIMARY KEY (id),
+  CONSTRAINT crates_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.discover_posts (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  author_id uuid,
+  type text NOT NULL,
+  title text,
+  description text,
+  location USER-DEFINED,
+  address text,
+  metadata jsonb,
+  active boolean DEFAULT true,
+  expires_at timestamp with time zone,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT discover_posts_pkey PRIMARY KEY (id),
+  CONSTRAINT discover_posts_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.event_rsvps (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  event_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  status text NOT NULL DEFAULT 'interested'::text CHECK (status = ANY (ARRAY['interested'::text, 'going'::text, 'not_going'::text])),
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT event_rsvps_pkey PRIMARY KEY (id),
+  CONSTRAINT event_rsvps_event_id_fkey FOREIGN KEY (event_id) REFERENCES public.discover_posts(id),
+  CONSTRAINT event_rsvps_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.exchanges (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  seller_id uuid,
+  buyer_id uuid,
+  selling_ids ARRAY,
+  status text DEFAULT 'pending'::text,
+  completed_at timestamp with time zone,
+  buying_ids ARRAY,
+  CONSTRAINT exchanges_pkey PRIMARY KEY (id),
+  CONSTRAINT exchanges_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES public.users(id),
+  CONSTRAINT exchanges_buyer_id_fkey FOREIGN KEY (buyer_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.friendships (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  requester_id uuid,
+  addressee_id uuid,
+  status text DEFAULT 'pending'::text,
+  created_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT friendships_pkey PRIMARY KEY (id),
+  CONSTRAINT friendships_requester_id_fkey FOREIGN KEY (requester_id) REFERENCES public.users(id),
+  CONSTRAINT friendships_addressee_id_fkey FOREIGN KEY (addressee_id) REFERENCES public.users(id)
+);
+CREATE TABLE public.messages (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  thread_id uuid NOT NULL,
+  sender_id uuid,
+  body text,
+  created_at timestamp with time zone DEFAULT now(),
+  exchange_id uuid NOT NULL,
+  CONSTRAINT messages_pkey PRIMARY KEY (id),
+  CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.users(id),
+  CONSTRAINT messages_exchange_id_fkey FOREIGN KEY (exchange_id) REFERENCES public.exchanges(id)
+);
+CREATE TABLE public.users (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  username text NOT NULL UNIQUE,
+  display_name text,
+  avatar_url text,
+  location USER-DEFINED,
+  bio text,
+  created_at timestamp with time zone DEFAULT now(),
+  user_id uuid NOT NULL,
+  CONSTRAINT users_pkey PRIMARY KEY (id),
+  CONSTRAINT users_user_id_fkey1 FOREIGN KEY (user_id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.vinyl_crates (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  vinyl_id uuid NOT NULL,
+  crate_id uuid NOT NULL,
+  added_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT vinyl_crates_pkey PRIMARY KEY (id),
+  CONSTRAINT vinyl_crates_vinyl_id_fkey FOREIGN KEY (vinyl_id) REFERENCES public.vinyl_entries(id),
+  CONSTRAINT vinyl_crates_crate_id_fkey FOREIGN KEY (crate_id) REFERENCES public.crates(id)
+);
+CREATE TABLE public.vinyl_entries (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  owner_id uuid,
+  discogs_id text,
+  nfc_tag_hash text UNIQUE,
+  title text NOT NULL,
+  artist text NOT NULL,
+  label text,
+  year integer,
+  format text,
+  media_grade text,
+  grade_notes text,
+  cover_art_url text,
+  for_sale boolean DEFAULT false,
+  asking_price numeric,
+  created_at timestamp with time zone DEFAULT now(),
+  catalog_number text,
+  matrix_code text,
+  barcode text,
+  release_edition USER-DEFINED NOT NULL DEFAULT 'standard'::release_edition,
+  edition_notes text,
+  sleeve_grade text,
+  CONSTRAINT vinyl_entries_pkey PRIMARY KEY (id),
+  CONSTRAINT vinyl_entries_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(id)
+);

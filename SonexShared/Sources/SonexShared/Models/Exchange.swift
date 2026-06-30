@@ -2,15 +2,15 @@ import Foundation
 
 // MARK: - Exchange
 
-struct Exchange: Codable, Identifiable {
-    let id: String
-    let sellerId: String
-    let buyerId: String
-    var recordIds: [String]
-    var totalPrice: Double?
-    var status: ExchangeStatus
-    var qrSession: String?
-    var completedAt: String?
+public struct Exchange: Codable, Identifiable {
+    public let id: String
+    public let sellerId: String
+    public let buyerId: String
+    public var recordIds: [String]
+    public var totalPrice: Double?
+    public var status: ExchangeStatus
+    public var qrSession: String?
+    public var completedAt: String?
 
     enum CodingKeys: String, CodingKey {
         case id, status

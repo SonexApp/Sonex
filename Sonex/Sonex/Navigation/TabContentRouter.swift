@@ -47,7 +47,7 @@ private extension View {
                 .navigationBarTitleDisplayMode(.large)
                 .toolbarColorScheme(.dark, for: .navigationBar)
         }
-        .tint(Color.sonexAmber)
+        .tint(Color(red: 255/255, green: 159/255, blue: 10/255))
     }
 
     func tabVisible(_ isVisible: Bool) -> some View {

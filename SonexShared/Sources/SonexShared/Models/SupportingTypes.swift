@@ -7,11 +7,13 @@
 // and Identifiable for SwiftUI list rendering.
 
 import Foundation
+import CoreLocation
 
 // MARK: - Shared Typealiases
 
 public typealias RecordID = UUID
 public typealias UserID   = UUID
+public typealias SonexLocation = PostGISPoint
 
 // MARK: - SUPPORTING TYPES
 
@@ -19,8 +21,25 @@ public typealias UserID   = UUID
 // Supabase returns PostGIS geography as GeoJSON from .select()
 // Use ST_AsGeoJSON() or the geography column directly depending on client config
 public struct PostGISPoint: Codable, Hashable {
-    let longitude: Double
-    let latitude: Double
+    public let longitude: Double
+    public let latitude: Double
+    
+    /// Create a new PostGISPoint with latitude and longitude
+    public init(latitude: Double, longitude: Double) {
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+    
+    /// Create a new PostGISPoint from a CLLocationCoordinate2D
+    public init(coordinate: CLLocationCoordinate2D) {
+        self.latitude = coordinate.latitude
+        self.longitude = coordinate.longitude
+    }
+    
+    /// Convert to CLLocationCoordinate2D for use with MapKit and CoreLocation
+    public var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
 
     // Decodes from GeoJSON: { "type": "Point", "coordinates": [lng, lat] }
     public init(from decoder: Decoder) throws {
@@ -50,12 +69,12 @@ public struct PostGISPoint: Codable, Hashable {
 
 // MARK: AnyCodable
 // Lightweight type-erased wrapper for jsonb metadata fields
-struct AnyCodable: Codable {
+public struct AnyCodable: Codable, Equatable {
     let value: Any
 
-    init(_ value: Any) { self.value = value }
+    public init(_ value: Any) { self.value = value }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let int    = try? container.decode(Int.self)    { value = int; return }
         if let double = try? container.decode(Double.self) { value = double; return }
@@ -68,7 +87,7 @@ struct AnyCodable: Codable {
         value = NSNull()
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch value {
         case let v as Int:              try container.encode(v)
@@ -78,6 +97,28 @@ struct AnyCodable: Codable {
         case let v as [Any]:            try container.encode(v.map { AnyCodable($0) })
         case let v as [String: Any]:    try container.encode(v.mapValues { AnyCodable($0) })
         default:                        try container.encodeNil()
+        }
+    }
+    
+    // MARK: - Equatable Conformance
+    public static func == (lhs: AnyCodable, rhs: AnyCodable) -> Bool {
+        switch (lhs.value, rhs.value) {
+        case (let lhsValue as Int, let rhsValue as Int):
+            return lhsValue == rhsValue
+        case (let lhsValue as Double, let rhsValue as Double):
+            return lhsValue == rhsValue
+        case (let lhsValue as Bool, let rhsValue as Bool):
+            return lhsValue == rhsValue
+        case (let lhsValue as String, let rhsValue as String):
+            return lhsValue == rhsValue
+        case (let lhsValue as [AnyCodable], let rhsValue as [AnyCodable]):
+            return lhsValue == rhsValue
+        case (let lhsValue as [String: AnyCodable], let rhsValue as [String: AnyCodable]):
+            return lhsValue == rhsValue
+        case (is NSNull, is NSNull):
+            return true
+        default:
+            return false
         }
     }
 }
@@ -102,12 +143,16 @@ struct ProfileUpdatePayload: Encodable {
     var displayName: String?
     var avatarUrl: String?
     var bio: String?
+    var address: String?
+    var is_signature: Bool?
 
     enum CodingKeys: String, CodingKey {
         case username
         case displayName = "display_name"
         case avatarUrl  = "avatar_url"
         case bio
+        case is_signature = "is_signature"
+        case address
     }
 }
 

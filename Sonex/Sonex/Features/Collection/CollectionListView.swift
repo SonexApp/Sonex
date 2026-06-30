@@ -8,20 +8,29 @@
 import SwiftUI
 import SonexShared
 
+// MARK: - Search Result Data Structure
+struct VinylSearchResult: Identifiable {
+    let id = UUID()
+    let vinyl: VinylEntry
+    let crateName: String
+}
+
 struct CollectionListView: View {
-    @State private var crates: [Crate] = []
+    @State private var crates: [CrateWithCount] = []
     @State private var isLoading = true
     @State private var searchText = ""
     @State private var showingAddCrate = false
     @State private var totalRecords = 0
-    @State private var estimatedValue: Double = 18640.0 // Placeholder from mockup
+    @State private var searchResults: [VinylSearchResult] = []
+    @State private var isSearching = false
+    @State private var searchTask: Task<Void, Never>?
     
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
-    var filteredCrates: [Crate] {
+    var filteredCrates: [CrateWithCount] {
         let filtered = searchText.isEmpty ? crates : crates.filter { crate in
             crate.name.localizedCaseInsensitiveContains(searchText)
         }
@@ -60,11 +69,6 @@ struct CollectionListView: View {
                             color: .white
                         )
                         
-                        StatView(
-                            label: "EST.",
-                            value: "$\(String(format: "%.0f", estimatedValue))",
-                            color: Color.sonexAmber
-                        )
                         
                         StatView(
                             label: "CRATES",
@@ -85,6 +89,9 @@ struct CollectionListView: View {
                         TextField("Search your collection...", text: $searchText)
                             .textFieldStyle(PlainTextFieldStyle())
                             .foregroundColor(.white)
+                            .onChange(of: searchText) { _ in
+                                performSearchWithDebounce()
+                            }
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
@@ -94,43 +101,86 @@ struct CollectionListView: View {
                     .padding(.bottom, 16)
                 }
                 
-                // Crates section header
-                HStack {
-                    Text("CRATES")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.6))
-                        .fontWeight(.medium)
-                    
-                    Spacer()
-                    
-                    Button("SORT") {
-                        // TODO: Implement sort options
-                    }
-                    .font(.caption)
-                    .foregroundColor(Color.sonexAmber)
-                    .fontWeight(.medium)
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 16)
-                
-                // Crates grid
-                if isLoading {
-                    Spacer()
-                    ProgressView()
-                        .tint(Color.sonexAmber)
-                    Spacer()
-                } else {
-                    ScrollView {
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(filteredCrates) { crate in
-                                CrateView(crate: crate)
-                                    .onTapGesture {
-                                        // TODO: Navigate to crate detail
-                                    }
+                // Content based on search state
+                if !searchText.isEmpty {
+                    // Search results view
+                    VStack(spacing: 0) {
+                        // Search results header
+                        HStack {
+                            Text("SEARCH RESULTS")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.6))
+                                .fontWeight(.medium)
+                            
+                            if isSearching {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                    .tint(Color.sonexAmber)
+                                    .padding(.leading, 8)
                             }
+                            
+                            Spacer()
                         }
                         .padding(.horizontal, 24)
-                        .padding(.bottom, 100) // Space for dock and FAB
+                        .padding(.bottom, 16)
+                        
+                        // Search results list
+                        if searchResults.isEmpty && !isSearching {
+                            VStack(spacing: 12) {
+                                Image(systemName: "music.note.list")
+                                    .font(.title2)
+                                    .foregroundColor(.white.opacity(0.4))
+                                Text("No records found")
+                                    .font(.headline)
+                                    .foregroundColor(.white.opacity(0.6))
+                                Text("Try adjusting your search terms")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.4))
+                            }
+                            .frame(maxHeight: .infinity)
+                            .padding()
+                        } else {
+                            ScrollView {
+                                LazyVStack(spacing: 12) {
+                                    ForEach(searchResults) { result in
+                                        SearchResultRowView(result: result)
+                                    }
+                                }
+                                .padding(.horizontal, 24)
+                                .padding(.bottom, 100) // Space for dock and FAB
+                            }
+                        }
+                    }
+                } else {
+                    // Crates section header
+                    HStack {
+                        Text("CRATES")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.6))
+                            .fontWeight(.medium)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+                    
+                    // Crates grid
+                    if isLoading {
+                        Spacer()
+                        ProgressView()
+                            .tint(Color.sonexAmber)
+                        Spacer()
+                    } else {
+                        ScrollView {
+                            LazyVGrid(columns: columns, spacing: 16) {
+                                ForEach(filteredCrates) { crate in
+                                    NavigationLink(destination: SingleCrateView(crate: crate)) {
+                                        CrateView(crate: crate)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 100) // Space for dock and FAB
+                        }
                     }
                 }
             }
@@ -167,7 +217,11 @@ struct CollectionListView: View {
             await loadCrates(forceRefresh: true)
         }
         .sheet(isPresented: $showingAddCrate) {
-            AddCrateSheet()
+            AddCrateSheet {
+                Task {
+                    await loadCrates(forceRefresh: true)
+                }
+            }
         }
     }
     
@@ -176,21 +230,236 @@ struct CollectionListView: View {
         isLoading = true
         
         do {
-            crates = try await SonexDBManager.shared.fetchCrates(forceRefresh: forceRefresh)
-            // TODO: Calculate total records from vinyl entries
-            totalRecords = crates.reduce(0) { total, crate in
-                total + (crate.vinyl_entry_ids.count ?? 0)
-            }
+            print("📦 Loading crates with forceRefresh: \(forceRefresh)")
+            
+            // Use the new bulk fetch method that gets crates with their record counts
+            async let cratesWithCountsTask = SonexDBManager.shared.fetchCratesWithCounts(forceRefresh: forceRefresh)
+            async let totalRecordsTask = SonexDBManager.shared.fetchTotalUserRecords(forceRefresh: forceRefresh)
+            
+            // Execute both queries concurrently
+            let cratesWithCounts = try await cratesWithCountsTask
+            let userTotalRecords = try await totalRecordsTask
+            
+            print("✅ Successfully loaded \(cratesWithCounts.count) crates with \(userTotalRecords) total records")
+            
+            // Assign the crates with counts directly
+            crates = cratesWithCounts
+            totalRecords = userTotalRecords
+            
         } catch {
-            print("Failed to load crates: \(error)")
-            // For offline functionality, we could load from local cache here
+            print("❌ Failed to load crates: \(error)")
+            
+            // Print more detailed error information
+            if let decodingError = error as? DecodingError {
+                switch decodingError {
+                case .typeMismatch(let type, let context):
+                    print("🔍 Type mismatch - Expected: \(type), Context: \(context)")
+                case .valueNotFound(let value, let context):
+                    print("🔍 Value not found - Value: \(value), Context: \(context)")
+                case .keyNotFound(let key, let context):
+                    print("🔍 Key not found - Key: \(key), Context: \(context)")
+                case .dataCorrupted(let context):
+                    print("🔍 Data corrupted - Context: \(context)")
+                @unknown default:
+                    print("🔍 Unknown decoding error: \(decodingError)")
+                }
+            }
+            
+            // For offline functionality, try to load from cache
+            do {
+                print("🔄 Attempting to load cached crates...")
+                crates = try await SonexDBManager.shared.fetchCratesWithCounts(forceRefresh: false)
+                totalRecords = crates.reduce(0) { total, crate in
+                    total + crate.recordCount
+                }
+                print("✅ Successfully loaded \(crates.count) cached crates")
+            } catch {
+                print("❌ Failed to load cached crates: \(error)")
+                // Keep existing data if available
+            }
         }
         
         isLoading = false
     }
+    
+    // MARK: - Search Methods
+    
+    private func performSearchWithDebounce() {
+        // Cancel any existing search task
+        searchTask?.cancel()
+        
+        // Create a new debounced search task
+        searchTask = Task {
+            // Wait for 300ms to debounce
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            
+            // Check if the task was cancelled
+            guard !Task.isCancelled else { return }
+            
+            await searchVinylEntries()
+        }
+    }
+    
+    private func performSearch() {
+        Task {
+            await searchVinylEntries()
+        }
+    }
+    
+    @MainActor
+    private func searchVinylEntries() async {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Clear results if query is empty
+        guard !query.isEmpty else {
+            searchResults = []
+            return
+        }
+        
+        // Don't search if query is too short
+        guard query.count >= 2 else {
+            return
+        }
+        
+        isSearching = true
+        searchResults = []
+        
+        do {
+            print("🔍 Starting search for query: '\(query)'")
+            
+            // Get all crates excluding "For Sale"
+            let allCrates = crates.filter { $0.name != "For Sale" }
+            
+            var allResults: [VinylSearchResult] = []
+            
+            // Search through each crate
+            for crate in allCrates {
+                do {
+                    let vinylEntries = try await SonexDBManager.shared.fetchVinylEntries(inCrate: crate.id)
+                    
+                    // Filter vinyl entries that match the search query
+                    let matchingEntries = vinylEntries.filter { vinyl in
+                        vinyl.title.localizedCaseInsensitiveContains(query) ||
+                        vinyl.artist.localizedCaseInsensitiveContains(query)
+                    }
+                    
+                    // Convert to search results
+                    let resultsFromCrate = matchingEntries.map { vinyl in
+                        VinylSearchResult(vinyl: vinyl, crateName: crate.name)
+                    }
+                    
+                    allResults.append(contentsOf: resultsFromCrate)
+                    
+                    print("✅ Found \(matchingEntries.count) matches in crate '\(crate.name)'")
+                    
+                } catch {
+                    print("❌ Failed to search in crate '\(crate.name)': \(error)")
+                }
+            }
+            
+            // Sort results by artist, then by title
+            allResults.sort { lhs, rhs in
+                if lhs.vinyl.artist != rhs.vinyl.artist {
+                    return lhs.vinyl.artist < rhs.vinyl.artist
+                }
+                return lhs.vinyl.title < rhs.vinyl.title
+            }
+            
+            searchResults = allResults
+            print("✅ Search completed. Found \(allResults.count) total matches")
+            
+        } catch {
+            print("❌ Search failed: \(error)")
+            searchResults = []
+        }
+        
+        isSearching = false
+    }
 }
 
 // MARK: - Supporting Views
+
+struct SearchResultRowView: View {
+    let result: VinylSearchResult
+    
+    var body: some View {
+        NavigationLink(destination: AlbumDetailsView(vinyl: result.vinyl)) {
+            HStack(spacing: 12) {
+                // Album artwork placeholder
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color.sonexSurface)
+                    .frame(width: 50, height: 50)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color.white.opacity(0.1), lineWidth: 0.5)
+                    )
+                    .overlay {
+                        if let coverArtUrl = result.vinyl.coverArtUrl, !coverArtUrl.isEmpty {
+                            AsyncImage(url: URL(string: coverArtUrl)) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Image(systemName: "music.note")
+                                    .font(.title3)
+                                    .foregroundColor(.white.opacity(0.4))
+                            }
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        } else {
+                            Image(systemName: "music.note")
+                                .font(.title3)
+                                .foregroundColor(.white.opacity(0.4))
+                        }
+                    }
+                
+                // Album info
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(result.vinyl.title)
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    
+                    Text(result.vinyl.artist)
+                        .font(.subheadline)
+                        .foregroundColor(Color.sonexAmber)
+                        .lineLimit(1)
+                    
+                    HStack(spacing: 4) {
+                        Text("in \(result.crateName)")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.6))
+                        
+                        if let year = result.vinyl.year {
+                            Text("•")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.4))
+                            
+                            Text(String(year))
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                // Navigation arrow
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.white.opacity(0.3))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.sonexSurface)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.white.opacity(0.1), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
 
 struct StatView: View {
     let label: String
@@ -213,29 +482,28 @@ struct StatView: View {
 }
 
 struct CrateView: View {
-    let crate: Crate
+    let crate: CrateWithCount
     
     var body: some View {
         VStack(spacing: 0) {
             // Record spines section
             VStack(spacing: 0) {
                 // Colorful record spines
-                RecordSpinesView(count: crate.vinyl_entry_ids.count ?? 0)
+                RecordSpinesView(count: crate.recordCount)
                     .frame(height: 40)
+                    .padding(.horizontal, 20)
                 
                 // Crate body
                 ZStack {
                     // Crate image background
                     Image("crate") // Using the crate asset from your project
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(height: 80)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 100)
                         .clipped()
                     
                     // Crate label overlay
                     VStack {
-                        Spacer()
-                        
                         Text(crate.name)
                             .font(.caption)
                             .fontWeight(.medium)
@@ -244,6 +512,16 @@ struct CrateView: View {
                             .padding(.vertical, 4)
                             .background(getCrateLabelBackground())
                             .cornerRadius(4)
+                        
+                        // Record count
+                        Text("\(crate.recordCount) records")
+                            .font(.caption2)
+                            .fontWeight(.regular)
+                            .foregroundColor(.white.opacity(0.8))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(.black.opacity(0.6))
+                            .cornerRadius(3)
                             .padding(.bottom, 8)
                     }
                 }
@@ -288,7 +566,7 @@ struct RecordSpinesView: View {
             ForEach(0..<min(count, 20), id: \.self) { index in
                 Rectangle()
                     .fill(spineColors[index % spineColors.count])
-                    .frame(width: CGFloat.random(in: 3...8))
+                    .frame(width: CGFloat.random(in: 2...5))
             }
             
             if count == 0 {
@@ -296,7 +574,7 @@ struct RecordSpinesView: View {
                 ForEach(0..<5, id: \.self) { _ in
                     Rectangle()
                         .fill(Color.white.opacity(0.1))
-                        .frame(width: CGFloat.random(in: 3...6))
+                        .frame(width: CGFloat.random(in: 2...4))
                 }
             }
             
@@ -311,6 +589,12 @@ struct AddCrateSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var crateName = ""
     @State private var isCreating = false
+    
+    let onCrateCreated: () -> Void
+    
+    init(onCrateCreated: @escaping () -> Void = {}) {
+        self.onCrateCreated = onCrateCreated
+    }
     
     var body: some View {
         NavigationView {
@@ -390,9 +674,9 @@ struct AddCrateSheet: View {
             do {
                 let trimmedName = crateName.trimmingCharacters(in: .whitespacesAndNewlines)
                 _ = try await SonexDBManager.shared.createCrate(named: trimmedName)
-                
                 await MainActor.run {
                     dismiss()
+                    onCrateCreated()
                 }
             } catch {
                 print("Failed to create crate: \(error)")
