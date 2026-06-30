@@ -1,4 +1,28 @@
-# Sonex App - 2026 USC Capstone
+# Sonex
+
+**A native iOS app that turns a vinyl collection into a tappable, tradeable, livable archive — built for USC's 2026 Integrated Design, Business & Technology capstone, in partnership with GotVinylNYC.**
+
+Sonex pairs an NFC-tagged "Spin Tag" sticker with every record in a collector's crate. Tap the tag and the record's full identity — pressing, condition grade, market value, ownership history — comes up instantly, on or off the app. Underneath that single gesture sits a full cataloging, valuation, and discovery system built for the people who actually live in record stores: collectors, curators, and consignors.
+
+The product was stress-tested live at a Record Store Day activation with GotVinylNYC, run by a three-person team: Ricardo Payares (Technical Lead), Calvin (Product/Design Lead), and Jasmine Louie (Marketing Lead).
+
+---
+
+## What it does
+
+**Catalog a record three ways.** Tap a blank NFC Spin Tag to start a new entry, snap a photo of the sleeve and let on-device Vision OCR plus a Gemini-powered suggestion engine identify the artist and album, or search Discogs directly. Whichever path you start from, the record resolves to the same registration flow — search results, Goldmine-standard grading (separate scores for media and sleeve, each with its own valuation multiplier), and a Discogs-sourced market price you can adjust before it's written into your crate.
+
+**Browse your crates like you'd flip through a milk crate.** Each crate renders as a swipeable card stack with drag-to-flip physics, a tap-through to full album detail, and a grid mode for batch-selecting records to move between crates. Cover art is cached locally so the stack stays smooth scrolling through fifty-plus records.
+
+**Discover what's happening nearby.** A MapKit-based Discover tab plots collection listings and community events as pins, filterable by post type, with RSVP support and a posting flow for sharing what's in your crate or what's coming up at your shop.
+
+**See your collection as a profile.** Stats, crate summaries, a following system (request → accept/block, not just mutual friends), and discover-post history live in a dedicated profile tab.
+
+**Work offline, sync later.** A dedicated offline cache manager persists crates, vinyl entries, user profile data, and cover art locally, queues pending writes while offline, and reconciles them once connectivity returns — not a bolt-on, but a parallel data path alongside the live Supabase queries.
+
+Exchange — peer-to-peer trading with QR-confirmed handoff — is scaffolded as the fifth tab and is the next major build target; see Implementation Status below.
+
+---
 
 ## Screenshots
 
@@ -7,60 +31,62 @@
 <img width="201" height="437" alt="3" src="https://github.com/user-attachments/assets/5e942c27-754c-4e5f-9c4e-aa3d777a8e5a" />
 <img width="201" height="437" alt="4" src="https://github.com/user-attachments/assets/5f7b914c-21bb-4d20-bdd8-30383a4ec606" />
 
-## Implementation Plan
+---
 
-### Week 1 -  Foundations & Data Layer
-***Goal:*** App runs, auth works, solid data layer, dock navigation
+## Product details
 
- - Xcode setup, targets, packages, shared models
- - Supabase setup: - 7 tables, RLS, Realtime on messages
- - Supabase manager: Auth, basic CRUD for vinyl_entries and crates
- - Discogs manager: SearchAlbums() and fetchRelease withing with real API responses
- - Custom SonexDock + ZStac-based table router with all 5 tabs stubbed (placeholder view)
- - Auth flow: login/signup screens, session persistance via keychain
- - @observalble ViewModels wires to supabase for Collection tab (fetch crates + entries)
-***End of week deliverable*** You can log in, you can see your crates list poulated from supabase, and switch tabs with no rerenders
-   
+### Cataloging & identification
+- **NFC registration** via CoreNFC: tag UID is hashed (SHA-256) and checked against Supabase to distinguish a blank tag from one already bound to a record, with a write-and-lock flow for NTAG215-class tags.
+- **Camera-to-metadata pipeline**: a sleeve photo runs through Apple's Vision framework for on-device text recognition, the extracted words are sent to a rate-limited Gemini API client which proposes an artist/album pair, and the result routes into Discogs search to confirm and pull canonical metadata. MusicBrainz is wired in as a secondary lookup source.
+- **Goldmine grading**: Mint through Poor, scored independently for media and sleeve, each carrying its own condition multiplier feeding into the suggested valuation.
+- **Discogs OAuth 1.0a integration**: full request-token/access-token flow, authenticated search, release detail and batch release fetching, wantlist read/write, and price-suggestion lookups, with built-in rate-limit backoff and OAuth debugging utilities.
 
-### Week 2 - NFC + Registration Flow + Collection View
-***Goal*** The core cataloging loop works end to end
- - NFC Manager: tag UID extraction -> SHA-256 hash -> supabase lookup (registered vs new)
- - CrateSceneView: SCNView milk crate wall, tap → sheet, UIViewRepresentable bridge
- - Record flip animation inside crate detail sheet (rotation3DEffect)
- - Full registration flow: AlbumSearchView (Discogs search, debounced) → GradingPickerView → ValuationView (pricing from DiscogsManager.fetchPricing) → ConfirmView → write to Supabase
- - Cover art fetched from Discogs, uploaded to Supabase Storage, URL stored in vinyl_entries
- - Collections search bar: live Discogs search, tapping result highlights the containing crate
+### Collection & crates
+- Card-stack crate view with drag-to-flip animation, a grid selection mode for multi-record moves between crates, and protected system crates (Unsorted, For Sale, Wishlist) that can't be deleted.
+- Crate and vinyl-entry data, plus cover art, are cached locally through a dedicated offline manager with a pending-operations queue, so the collection stays browsable without a connection and syncs once one is available.
 
-***End of week deliverable*** Tap and NFC tag -> register a record -> it appears in your crate. Search for an album -> crate highlights if in collection
+### Discover
+- MapKit map of nearby posts across collection listings and events, with a category filter bar, radius indicator, and a Supabase Realtime-backed activity feed.
+- Multi-step posting flow for both event details and collection listings, plus an RSVP system for events.
 
-### Week 3 - Discover map + Exchange + Messages
-***Goal*** Social and transactional features working
- - DiscoverMapView: MapKit pins for all 4 categories, filter bar, PostGIS geo query via Supabase RPC
- - Activity log sheet: Supabase realtime subscription to discover_posts, renders feed, tap-to-focus pin
- - Add Posting FAB: EventDetailsForm and CollectionListingFlow (full multi-step flow), writes to discover_posts
- - ExchangeView: cart management, QR session generation, SellSessionView (QR display), BuyerReviewView, transferOwnership Supabase transaction
- - MessagesView + ThreadView: fetch threads, Realtime subscription for live messages, offer CTA bar
- - Quick-reply chips, offer amount input, accept/decline offer status updates
-***End of the week deliverable*** You can post an event on the map, message another user about a record, and complete peer to peer exchange with QR confirmaiton
+### Profile & social
+- User stats, crate summary, and discover-post history.
+- A following system (not mutual-only friendship) with pending, accepted, and blocked states, plus nearby-collector discovery.
 
-### Week 4 - Wishlist, Profile, Polish + App Clip
-***Goal*** Remaining screens complete; App Clip working for unregistered tags
- - WishlistView: want list (Discogs search to add), price alerts (BGAppRefreshTask for background refresh), saved sellers
- - ProfileView: user stats, crate summary, friends list, settings (location, notification prefs)
- - FriendshipView: friend requests, friend discovery via nearby collectors on map
- - App Clip (TapTracksClip): ClipEntryView — tag detected → registered record → ClipRecordDetailView (read-only) or → prompt to download for registration
- - Push notifications: Supabase Edge Function triggers on new message, offer status change, price alert
- - Amber/charcoal design system consistency pass across all screens — typography, spacing, iconography
-***End of the week deliverable*** Full app is feature-complete. App Clip works on physical NFC tap. Notifications fire on key events.
+### Data layer
+- Supabase backend: Postgres tables for users, vinyl entries, crates (with a many-to-many crate membership join), discover posts, event RSVPs, friendships, exchanges, and messages, secured with row-level security.
+- A single `SonexDBManager` (the largest file in the codebase, ~5,000 lines) owns authentication/session handling, all CRUD across these tables, image caching, and the offline cache and sync queue described above.
+- `SonexShared`, a local Swift package, holds the data models, enums (vinyl grade, format, exchange/offer/friendship/RSVP status, discover post type), and the shared `SonexTab` definition so the app target and the in-progress App Clip target can consume the same types.
 
-### Week 5 - Hardening, Testfight, Iteration, Appstore Assets
-***Goal*** Shippable build; iterate on weak spots identified in internal testing
- - TestFlight build: distribute to 5–10 real collectors from your network
- - Real-world NFC testing: NTAG215 write-lock flow, tag re-read reliability
- - Discogs API rate limiting: implement request queue + exponential backoff in DiscogsManager
- - Supabase RLS audit: verify no data leakage across user boundaries
- - Performance: SceneKit crate rendering with 50+ records (LOD switching, texture atlasing)
- - Crash triage from TestFlight, top 3 UX friction points from tester feedback → fix
- - Prepare App Store assets: screenshots (use your existing HTML mockups as reference), privacy manifest, NFC usage description copy
+### Design system
+- Dark-mode-only amber-on-charcoal palette, Space Mono and DM Sans typography, applied consistently across the dock navigation, crate views, and forms.
 
-***End of the week deliverable*** Testflight 1.0 with real collector feedback. Prioritized v0.2 backlog ready.
+---
+
+## Implementation status
+
+This reflects what's actually built in the codebase as of the current commit, not the original 5-week plan (kept below for reference).
+
+| Area | Status |
+|---|---|
+| Auth, session persistence, Supabase data layer | Built |
+| Dock navigation (5 tabs: Crates, Tap, Discover, Exchange, Profile) | Built |
+| NFC tag scan + hash lookup | Built |
+| Camera capture → Vision OCR → Gemini suggestion → Discogs/MusicBrainz resolution | Built |
+| Discogs OAuth, search, pricing, wantlist | Built |
+| Goldmine grading + valuation | Built |
+| Crate card-stack view, grid multi-select, crate moves | Built |
+| Offline cache + pending-operation sync queue | Built |
+| Discover map, posting flow, RSVP | Built |
+| Profile, stats, following system | Built |
+| Exchange (cart, QR handoff, offer negotiation) | Scaffolded — placeholder tab, not yet implemented |
+| Messages / threaded chat | Not yet started |
+| App Clip (tap an unregistered tag without the app installed) | Scaffolded — target shell and entry view exist, registration logic not yet wired in |
+| Push notifications | Not yet started |
+| TestFlight distribution | Not yet started |
+
+---
+
+## Stack
+
+Swift, SwiftUI, CoreNFC, Vision (on-device OCR), Gemini API, Discogs API (OAuth 1.0a), MusicBrainz API, Supabase (Postgres, Auth, Realtime, Storage, Edge Functions), MapKit.
